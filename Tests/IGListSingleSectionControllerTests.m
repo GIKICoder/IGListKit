@@ -1,19 +1,19 @@
-/**
- * Copyright (c) 2016-present, Facebook, Inc.
- * All rights reserved.
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 #import <XCTest/XCTest.h>
+
 #import <OCMock/OCMock.h>
 
 #import "IGListAdapterInternal.h"
+#import "IGListTestCase.h"
 #import "IGTestCell.h"
 #import "IGTestSingleItemDataSource.h"
-#import "IGListTestCase.h"
+#import "IGTestSingleWithoutDeselectionDelegate.h"
 
 @interface IGListSingleSectionControllerTests : IGListTestCase
 
@@ -23,6 +23,7 @@
 
 - (void)setUp {
     self.dataSource = [IGTestSingleItemDataSource new];
+    self.frame = CGRectMake(0, 0, 100, 1000);
     [super setUp];
 }
 
@@ -99,6 +100,33 @@
     [[mockDelegate expect] didSelectSectionController:section withObject:self.dataSource.objects.firstObject];
     [self.adapter collectionView:self.collectionView didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
     [mockDelegate verify];
+}
+
+- (void)test_whenDeselected_thatDelegateReceivesEvent {
+    [self setupWithObjects:@[
+                             genTestObject(@1, @"a")
+                             ]];
+    IGListSingleSectionController *section = [self.adapter sectionControllerForObject:self.dataSource.objects.firstObject];
+    id mockDelegate = [OCMockObject mockForProtocol:@protocol(IGListSingleSectionControllerDelegate)];
+    section.selectionDelegate = mockDelegate;
+    [[mockDelegate expect] didDeselectSectionController:section withObject:self.dataSource.objects.firstObject];
+    [self.adapter collectionView:self.collectionView didDeselectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+    [mockDelegate verify];
+}
+
+- (void)test_whenDeselected_withoutImplementation_thatNoOps {
+    [self setupWithObjects:@[
+                             genTestObject(@1, @"a")
+                             ]];
+    IGListSingleSectionController *section = [self.adapter sectionControllerForObject:self.dataSource.objects.firstObject];
+    IGTestSingleWithoutDeselectionDelegate *delegate = [IGTestSingleWithoutDeselectionDelegate new];
+    section.selectionDelegate = delegate;
+
+    [self.adapter collectionView:self.collectionView didDeselectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+    XCTAssertFalse(delegate.selected);
+
+    [self.adapter collectionView:self.collectionView didSelectItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+    XCTAssertTrue(delegate.selected);
 }
 
 @end

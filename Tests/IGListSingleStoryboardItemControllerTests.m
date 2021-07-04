@@ -1,18 +1,16 @@
-/**
- * Copyright (c) 2016-present, Facebook, Inc.
- * All rights reserved.
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 #import <XCTest/XCTest.h>
 
-#import "IGTestStoryboardCell.h"
-#import "IGTestSingleStoryboardItemDataSource.h"
-#import "IGTestStoryboardViewController.h"
 #import "IGListTestCase.h"
+#import "IGTestSingleStoryboardItemDataSource.h"
+#import "IGTestStoryboardCell.h"
+#import "IGTestStoryboardViewController.h"
 
 #define genExpectation [self expectationWithDescription:NSStringFromSelector(_cmd)]
 
@@ -31,7 +29,7 @@
 
 - (void)setUp {
     [super setUp];
-    self.window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+    self.window = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, 100, 1000)];
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"IGTestStoryboard" bundle:[NSBundle bundleForClass:self.class]];
     self.viewController = [storyboard instantiateViewControllerWithIdentifier:@"testVC"];
     [self.window addSubview:self.viewController.view];

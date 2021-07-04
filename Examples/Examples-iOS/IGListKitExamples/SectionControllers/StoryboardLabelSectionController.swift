@@ -1,19 +1,12 @@
-/**
- Copyright (c) 2016-present, Facebook, Inc. All rights reserved.
- 
- The examples provided by Facebook are for non-commercial testing and evaluation
- purposes only. Facebook reserves all rights not expressly granted.
- 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
- ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
-import UIKit
 import IGListKit
+import UIKit
 
 protocol StoryboardLabelSectionControllerDelegate: class {
     func removeSectionControllerWantsRemoved(_ sectionController: StoryboardLabelSectionController)
@@ -25,15 +18,14 @@ final class StoryboardLabelSectionController: ListSectionController {
     weak var delegate: StoryboardLabelSectionControllerDelegate?
 
     override func sizeForItem(at index: Int) -> CGSize {
-        return CGSize(width: (self.object?.name.characters.count)! * 7, height: (self.object?.name.characters.count)! * 7)
+        return CGSize(width: (self.object?.name.count)! * 7, height: (self.object?.name.count)! * 7)
     }
 
     override func cellForItem(at index: Int) -> UICollectionViewCell {
-        guard let cell = collectionContext?.dequeueReusableCellFromStoryboard(withIdentifier: "cell",
-                                                                              for: self,
-                                                                              at: index) as? StoryboardCell else {
-                                                                                fatalError()
-        }
+        let cell: StoryboardCell = collectionContext.dequeueReusableCellFromStoryboard(
+            withIdentifier: "cell",
+            for: self,
+            at: index)
         cell.text = object?.name
         return cell
     }

@@ -1,19 +1,12 @@
-/**
- Copyright (c) 2016-present, Facebook, Inc. All rights reserved.
- 
- The examples provided by Facebook are for non-commercial testing and evaluation
- purposes only. Facebook reserves all rights not expressly granted.
- 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
- ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
-import UIKit
 import IGListKit
+import UIKit
 
 final class MonthSectionController: ListBindingSectionController<ListDiffable>, ListBindingSectionControllerDataSource, ListBindingSectionControllerSelectionDelegate {
 
@@ -57,17 +50,14 @@ final class MonthSectionController: ListBindingSectionController<ListDiffable>, 
     func sectionController(_ sectionController: ListBindingSectionController<ListDiffable>,
                            cellForViewModel viewModel: Any,
                            at index: Int) -> UICollectionViewCell & ListBindable {
-        let cellClass: AnyClass
-        if viewModel is DayViewModel {
-            cellClass = CalendarDayCell.self
-        } else if viewModel is MonthTitleViewModel {
-            cellClass = MonthTitleCell.self
-        } else {
-            cellClass = LabelCell.self
+        switch viewModel {
+        case is DayViewModel:
+            return collectionContext.dequeueReusableCell(for: self, at: index) as CalendarDayCell
+        case is MonthTitleViewModel:
+            return collectionContext.dequeueReusableCell(for: self, at: index) as MonthTitleCell
+        default:
+            return collectionContext.dequeueReusableCell(for: self, at: index) as LabelCell
         }
-        guard let cell =  collectionContext?.dequeueReusableCell(of: cellClass, for: self, at: index) as? UICollectionViewCell & ListBindable
-            else { fatalError() }
-        return cell
     }
 
     func sectionController(_ sectionController: ListBindingSectionController<ListDiffable>,
@@ -95,5 +85,11 @@ final class MonthSectionController: ListBindingSectionController<ListDiffable>, 
         }
         update(animated: true)
     }
+
+    func sectionController(_ sectionController: ListBindingSectionController<ListDiffable>, didDeselectItemAt index: Int, viewModel: Any) {}
+
+    func sectionController(_ sectionController: ListBindingSectionController<ListDiffable>, didHighlightItemAt index: Int, viewModel: Any) {}
+
+    func sectionController(_ sectionController: ListBindingSectionController<ListDiffable>, didUnhighlightItemAt index: Int, viewModel: Any) {}
 
 }

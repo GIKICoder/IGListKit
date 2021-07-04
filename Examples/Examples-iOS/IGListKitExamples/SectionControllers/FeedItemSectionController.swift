@@ -1,18 +1,12 @@
-/**
- Copyright (c) 2016-present, Facebook, Inc. All rights reserved.
-
- The examples provided by Facebook are for non-commercial testing and evaluation
- purposes only. Facebook reserves all rights not expressly granted.
-
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
- ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 import IGListKit
+import IGListSwiftKit
 
 final class FeedItemSectionController: ListSectionController, ListSupplementaryViewSource {
 
@@ -34,9 +28,7 @@ final class FeedItemSectionController: ListSectionController, ListSupplementaryV
     }
 
     override func cellForItem(at index: Int) -> UICollectionViewCell {
-        guard let cell = collectionContext?.dequeueReusableCell(of: LabelCell.self, for: self, at: index) as? LabelCell else {
-            fatalError()
-        }
+        let cell: LabelCell = collectionContext.dequeueReusableCell(for: self, at: index)
         cell.text = feedItem.comments[index]
         return cell
     }
@@ -48,24 +40,45 @@ final class FeedItemSectionController: ListSectionController, ListSupplementaryV
     // MARK: ListSupplementaryViewSource
 
     func supportedElementKinds() -> [String] {
-        return [UICollectionElementKindSectionHeader]
+        return [UICollectionView.elementKindSectionHeader, UICollectionView.elementKindSectionFooter]
     }
 
     func viewForSupplementaryElement(ofKind elementKind: String, at index: Int) -> UICollectionReusableView {
-        guard let view = collectionContext?.dequeueReusableSupplementaryView(ofKind: UICollectionElementKindSectionHeader,
-                                                                       for: self,
-                                                                       nibName: "UserHeaderView",
-                                                                       bundle: nil,
-                                                                       at: index) as? UserHeaderView else {
-                                                                        fatalError()
+        switch elementKind {
+        case UICollectionView.elementKindSectionHeader:
+            return userHeaderView(atIndex: index)
+        case UICollectionView.elementKindSectionFooter:
+            return userFooterView(atIndex: index)
+        default:
+            fatalError()
         }
-        view.handle = "@" + feedItem.user.handle
-        view.name = feedItem.user.name
-        return view
     }
 
     func sizeForSupplementaryView(ofKind elementKind: String, at index: Int) -> CGSize {
         return CGSize(width: collectionContext!.containerSize.width, height: 40)
     }
 
+    // MARK: Private
+    private func userHeaderView(atIndex index: Int) -> UICollectionReusableView {
+        let view: UserHeaderView = collectionContext.dequeueReusableSupplementaryView(
+            ofKind: UICollectionView.elementKindSectionHeader,
+            forSectionController: self,
+            nibName: "UserHeaderView",
+            bundle: nil,
+            atIndex: index)
+        view.handle = "@" + feedItem.user.handle
+        view.name = feedItem.user.name
+        return view
+    }
+
+    private func userFooterView(atIndex index: Int) -> UICollectionReusableView {
+        let view: UserFooterView = collectionContext.dequeueReusableSupplementaryView(
+            ofKind: UICollectionView.elementKindSectionFooter,
+            forSectionController: self,
+            nibName: "UserFooterView",
+            bundle: nil,
+            atIndex: index)
+        view.commentsCount = "\(feedItem.comments.count)"
+        return view
+    }
 }
